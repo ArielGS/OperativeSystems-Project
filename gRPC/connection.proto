@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package connection;
+
+message SubscribeRequest{
+    string topic = 1;
+    string client = 2;
+}
+
+message SubscribeResponse{
+    bool subsResponse = 1;
+}
+
+message PostRequest{
+    string text = 1;
+    string topic = 2;
+    string publisher = 3;
+}
+
+message PostResponse{
+    bool postedResponse = 1;
+    string textResponse = 2;
+}
+
+service SubscribeService{
+    rpc SubcribeToTopic(SubscribeRequest) returns (SubscribeResponse){}
+}
+
+service PostIntoTopicService{
+    rpc PostIntoTopic(PostRequest) returns (PostResponse){}
+}
