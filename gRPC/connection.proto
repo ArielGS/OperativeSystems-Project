@@ -22,10 +22,23 @@ message PostResponse{
     string textResponse = 2;
 }
 
+message LoginRequest{
+    string username = 1;
+}
+
+message LoginResponse{
+    repeated string topics = 1;
+    int32 idNumber = 2;
+}
+
 service SubscribeService{
     rpc SubcribeToTopic(SubscribeRequest) returns (SubscribeResponse){}
 }
 
 service PostIntoTopicService{
     rpc PostIntoTopic(PostRequest) returns (PostResponse){}
+}
+
+service LoginService{
+    rpc LoginIntoApp(LoginRequest) returns (LoginResponse){}
 }

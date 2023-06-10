@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15gRPC/connection.proto\x12\nconnection\"1\n\x10SubscribeRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x0e\n\x06\x63lient\x18\x02 \x01(\t\")\n\x11SubscribeResponse\x12\x14\n\x0csubsResponse\x18\x01 \x01(\x08\"=\n\x0bPostRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\x12\x11\n\tpublisher\x18\x03 \x01(\t\"<\n\x0cPostResponse\x12\x16\n\x0epostedResponse\x18\x01 \x01(\x08\x12\x14\n\x0ctextResponse\x18\x02 \x01(\t2d\n\x10SubscribeService\x12P\n\x0fSubcribeToTopic\x12\x1c.connection.SubscribeRequest\x1a\x1d.connection.SubscribeResponse\"\x00\x32\\\n\x14PostIntoTopicService\x12\x44\n\rPostIntoTopic\x12\x17.connection.PostRequest\x1a\x18.connection.PostResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15gRPC/connection.proto\x12\nconnection\"1\n\x10SubscribeRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x0e\n\x06\x63lient\x18\x02 \x01(\t\")\n\x11SubscribeResponse\x12\x14\n\x0csubsResponse\x18\x01 \x01(\x08\"=\n\x0bPostRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\x12\x11\n\tpublisher\x18\x03 \x01(\t\"<\n\x0cPostResponse\x12\x16\n\x0epostedResponse\x18\x01 \x01(\x08\x12\x14\n\x0ctextResponse\x18\x02 \x01(\t\" \n\x0cLoginRequest\x12\x10\n\x08username\x18\x01 \x01(\t\"1\n\rLoginResponse\x12\x0e\n\x06topics\x18\x01 \x03(\t\x12\x10\n\x08idNumber\x18\x02 \x01(\x05\x32\x64\n\x10SubscribeService\x12P\n\x0fSubcribeToTopic\x12\x1c.connection.SubscribeRequest\x1a\x1d.connection.SubscribeResponse\"\x00\x32\\\n\x14PostIntoTopicService\x12\x44\n\rPostIntoTopic\x12\x17.connection.PostRequest\x1a\x18.connection.PostResponse\"\x00\x32U\n\x0cLoginService\x12\x45\n\x0cLoginIntoApp\x12\x18.connection.LoginRequest\x1a\x19.connection.LoginResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'gRPC.connection_pb2', globals())
@@ -28,8 +28,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _POSTREQUEST._serialized_end=192
   _POSTRESPONSE._serialized_start=194
   _POSTRESPONSE._serialized_end=254
-  _SUBSCRIBESERVICE._serialized_start=256
-  _SUBSCRIBESERVICE._serialized_end=356
-  _POSTINTOTOPICSERVICE._serialized_start=358
-  _POSTINTOTOPICSERVICE._serialized_end=450
+  _LOGINREQUEST._serialized_start=256
+  _LOGINREQUEST._serialized_end=288
+  _LOGINRESPONSE._serialized_start=290
+  _LOGINRESPONSE._serialized_end=339
+  _SUBSCRIBESERVICE._serialized_start=341
+  _SUBSCRIBESERVICE._serialized_end=441
+  _POSTINTOTOPICSERVICE._serialized_start=443
+  _POSTINTOTOPICSERVICE._serialized_end=535
+  _LOGINSERVICE._serialized_start=537
+  _LOGINSERVICE._serialized_end=622
 # @@protoc_insertion_point(module_scope)

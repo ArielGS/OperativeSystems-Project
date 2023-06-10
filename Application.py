@@ -25,8 +25,20 @@ def login():
             success = True
             currentClient.name = username
             currentClient.state = "Online"
-            #update or crear StateInServer
-            mainMenu()
+            remoteCall = server.LoginServiceStub(channel)
+            request = sender.LoginRequest(username=currentClient.name)
+            response = remoteCall.LoginIntoApp(request)
+            if not response == None:
+                currentClient.subscribed = response.topics
+                print("\n ---------- LOGIN CLIENT ----------")
+                print("       Succesfully logged in.  \n")
+
+                input("       Press Enter to continue...      ")
+                mainMenu()
+            else:
+                print(" Incorrect username. Try again.  ")
+                input(" Press Enter to continue...      ")
+                os.system('cls')
         else:
             print(" Incorrect username. Try again.  ")
             input(" Press Enter to continue...      ")
