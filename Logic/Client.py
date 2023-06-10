@@ -3,6 +3,7 @@ class Client:
         self.name = name
         self.state = state
         self.subscribed = []
+        self.idNumber = 0
 
     def subscribe(self, topic):
         self.subscribed.append(topic)

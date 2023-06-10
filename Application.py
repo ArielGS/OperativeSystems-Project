@@ -83,7 +83,7 @@ def subscribeMenu():
     else:
         print("Something went wrong. Try again.")
         
-    time.sleep(2)
+    input(" Press Enter to continue...")
 
 def postInTopic():
     exit = ""
