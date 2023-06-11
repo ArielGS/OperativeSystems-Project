@@ -13,29 +13,47 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15gRPC/connection.proto\x12\nconnection\"1\n\x10SubscribeRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x0e\n\x06\x63lient\x18\x02 \x01(\t\")\n\x11SubscribeResponse\x12\x14\n\x0csubsResponse\x18\x01 \x01(\x08\"=\n\x0bPostRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\x12\x11\n\tpublisher\x18\x03 \x01(\t\"<\n\x0cPostResponse\x12\x16\n\x0epostedResponse\x18\x01 \x01(\x08\x12\x14\n\x0ctextResponse\x18\x02 \x01(\t\" \n\x0cLoginRequest\x12\x10\n\x08username\x18\x01 \x01(\t\"1\n\rLoginResponse\x12\x0e\n\x06topics\x18\x01 \x03(\t\x12\x10\n\x08idNumber\x18\x02 \x01(\x05\x32\x64\n\x10SubscribeService\x12P\n\x0fSubcribeToTopic\x12\x1c.connection.SubscribeRequest\x1a\x1d.connection.SubscribeResponse\"\x00\x32\\\n\x14PostIntoTopicService\x12\x44\n\rPostIntoTopic\x12\x17.connection.PostRequest\x1a\x18.connection.PostResponse\"\x00\x32U\n\x0cLoginService\x12\x45\n\x0cLoginIntoApp\x12\x18.connection.LoginRequest\x1a\x19.connection.LoginResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15gRPC/connection.proto\x12\nconnection\" \n\x0cLoginRequest\x12\x10\n\x08username\x18\x01 \x01(\t\"1\n\rLoginResponse\x12\x0e\n\x06topics\x18\x01 \x03(\t\x12\x10\n\x08idNumber\x18\x02 \x01(\x05\"1\n\x10SubscribeRequest\x12\r\n\x05topic\x18\x01 \x01(\t\x12\x0e\n\x06\x63lient\x18\x02 \x01(\t\")\n\x11SubscribeResponse\x12\x14\n\x0csubsResponse\x18\x01 \x01(\x08\"=\n\x0bPostRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\x12\x11\n\tpublisher\x18\x03 \x01(\t\"<\n\x0cPostResponse\x12\x16\n\x0epostedResponse\x18\x01 \x01(\x08\x12\x14\n\x0ctextResponse\x18\x02 \x01(\t\"0\n\rListenRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\"%\n\x0eListenResponse\x12\x13\n\x0blisResponse\x18\x01 \x01(\t\"%\n\x11StopListenRequest\x12\x10\n\x08username\x18\x01 \x01(\t\"-\n\x12StopListenResponse\x12\x17\n\x0fstopLisResponse\x18\x01 \x01(\t\"G\n\x15RecieveMessageRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\r\n\x05topic\x18\x02 \x01(\t\x12\x11\n\tpublisher\x18\x03 \x01(\t\".\n\x16RecieveMessageResponse\x12\x14\n\x0creciResponse\x18\x01 \x01(\t2U\n\x0cLoginService\x12\x45\n\x0cLoginIntoApp\x12\x18.connection.LoginRequest\x1a\x19.connection.LoginResponse\"\x00\x32\x64\n\x10SubscribeService\x12P\n\x0fSubcribeToTopic\x12\x1c.connection.SubscribeRequest\x1a\x1d.connection.SubscribeResponse\"\x00\x32\\\n\x14PostIntoTopicService\x12\x44\n\rPostIntoTopic\x12\x17.connection.PostRequest\x1a\x18.connection.PostResponse\"\x00\x32\\\n\x10ListeningService\x12H\n\rListenToTopic\x12\x19.connection.ListenRequest\x1a\x1a.connection.ListenResponse\"\x00\x32l\n\x14StopListeningService\x12T\n\x11StopListenToTopic\x12\x1d.connection.StopListenRequest\x1a\x1e.connection.StopListenResponse\"\x00\x32r\n\x15RecieveMessageService\x12Y\n\x0eRecieveMessage\x12!.connection.RecieveMessageRequest\x1a\".connection.RecieveMessageResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'gRPC.connection_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _SUBSCRIBEREQUEST._serialized_start=37
-  _SUBSCRIBEREQUEST._serialized_end=86
-  _SUBSCRIBERESPONSE._serialized_start=88
-  _SUBSCRIBERESPONSE._serialized_end=129
-  _POSTREQUEST._serialized_start=131
-  _POSTREQUEST._serialized_end=192
-  _POSTRESPONSE._serialized_start=194
-  _POSTRESPONSE._serialized_end=254
-  _LOGINREQUEST._serialized_start=256
-  _LOGINREQUEST._serialized_end=288
-  _LOGINRESPONSE._serialized_start=290
-  _LOGINRESPONSE._serialized_end=339
-  _SUBSCRIBESERVICE._serialized_start=341
-  _SUBSCRIBESERVICE._serialized_end=441
-  _POSTINTOTOPICSERVICE._serialized_start=443
-  _POSTINTOTOPICSERVICE._serialized_end=535
-  _LOGINSERVICE._serialized_start=537
-  _LOGINSERVICE._serialized_end=622
+  _LOGINREQUEST._serialized_start=37
+  _LOGINREQUEST._serialized_end=69
+  _LOGINRESPONSE._serialized_start=71
+  _LOGINRESPONSE._serialized_end=120
+  _SUBSCRIBEREQUEST._serialized_start=122
+  _SUBSCRIBEREQUEST._serialized_end=171
+  _SUBSCRIBERESPONSE._serialized_start=173
+  _SUBSCRIBERESPONSE._serialized_end=214
+  _POSTREQUEST._serialized_start=216
+  _POSTREQUEST._serialized_end=277
+  _POSTRESPONSE._serialized_start=279
+  _POSTRESPONSE._serialized_end=339
+  _LISTENREQUEST._serialized_start=341
+  _LISTENREQUEST._serialized_end=389
+  _LISTENRESPONSE._serialized_start=391
+  _LISTENRESPONSE._serialized_end=428
+  _STOPLISTENREQUEST._serialized_start=430
+  _STOPLISTENREQUEST._serialized_end=467
+  _STOPLISTENRESPONSE._serialized_start=469
+  _STOPLISTENRESPONSE._serialized_end=514
+  _RECIEVEMESSAGEREQUEST._serialized_start=516
+  _RECIEVEMESSAGEREQUEST._serialized_end=587
+  _RECIEVEMESSAGERESPONSE._serialized_start=589
+  _RECIEVEMESSAGERESPONSE._serialized_end=635
+  _LOGINSERVICE._serialized_start=637
+  _LOGINSERVICE._serialized_end=722
+  _SUBSCRIBESERVICE._serialized_start=724
+  _SUBSCRIBESERVICE._serialized_end=824
+  _POSTINTOTOPICSERVICE._serialized_start=826
+  _POSTINTOTOPICSERVICE._serialized_end=918
+  _LISTENINGSERVICE._serialized_start=920
+  _LISTENINGSERVICE._serialized_end=1012
+  _STOPLISTENINGSERVICE._serialized_start=1014
+  _STOPLISTENINGSERVICE._serialized_end=1122
+  _RECIEVEMESSAGESERVICE._serialized_start=1124
+  _RECIEVEMESSAGESERVICE._serialized_end=1238
 # @@protoc_insertion_point(module_scope)

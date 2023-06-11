@@ -24,7 +24,7 @@ def login():
         if not username == "":
             success = True
             currentClient.name = username
-            currentClient.state = "Online"
+            currentClient.state = True
             remoteCall = server.LoginServiceStub(channel)
             request = sender.LoginRequest(username=currentClient.name)
             response = remoteCall.LoginIntoApp(request)
@@ -45,7 +45,7 @@ def login():
             os.system('cls')
 
 def logout():
-    currentClient.state = "Offline"
+    currentClient.state = False
     #Enviar señal a servidor para apagar hilo y
     #desactivar el worker / hilo 
     print("Leaving Session...")
@@ -137,14 +137,14 @@ def watchTopicPosts():
             continue
         
         print("\n ----- POSTS IN TOPIC" + topicSelected + " -----")
-            # Se piden los posts de un topico y se pone a a escuchar 
+            # Se cargan los posts de un topico (desde .pickle) y se pone a a escuchar 
             # si llegan nuevos mensajes (hay que usar hilos)
         exit = input("\n Exit? y/n : ")
 
         os.system('cls')
 
 def mainMenu():
-    while currentClient.state == "Online":
+    while currentClient.state == True:
         os.system('cls')
         print("\n ----------- MAIN MENU ------------")
         print("      1. Subscribe into topic        ")

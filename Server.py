@@ -16,7 +16,7 @@ def saveClients(clients):
         pickle.dump(clients, file)
 
 class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServicer, 
-             serverProto.PostIntoTopicServiceServicer):
+             serverProto.PostIntoTopicServiceServicer, serverProto.ListeningServiceServicer, serverProto.StopListeningServiceServicer):
     def __init__(self):
         self.messagesTopicA = []
         self.messagesTopicB = []
@@ -73,12 +73,23 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
                 return sender.PostResponse(postedResponse = False, textResponse = "You are not subscribed to that topic.")
         return sender.PostResponse(postedResponse = False, textResponse = "Error. Try again.")
     
+    def SendMessage(self, message):
+        return 0
+
+    def ListenToTopic(self, request, context):
+        return sender.ListenResponse(lisResponse = "Success")
+    
+    def StopListenToTopic(self, request, context):
+        return sender.StopListenResponse(stopLisResponse = "Success")
+
 def run_server():
     serverInstance = Server()
     serverGrpc = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
     serverProto.add_SubscribeServiceServicer_to_server(serverInstance, serverGrpc)
     serverProto.add_PostIntoTopicServiceServicer_to_server(serverInstance, serverGrpc)
     serverProto.add_LoginServiceServicer_to_server(serverInstance, serverGrpc)
+    serverProto.add_ListeningServiceServicer_to_server(serverInstance, serverGrpc)
+    serverProto.add_StopListeningServiceServicer_to_server(serverInstance, serverGrpc)
     serverGrpc.add_insecure_port('[::]:50051')
     serverGrpc.start()
     print("Initialized gRPC server in port 50051")

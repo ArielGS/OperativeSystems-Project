@@ -5,6 +5,67 @@ import grpc
 from gRPC import connection_pb2 as gRPC_dot_connection__pb2
 
 
+class LoginServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.LoginIntoApp = channel.unary_unary(
+                '/connection.LoginService/LoginIntoApp',
+                request_serializer=gRPC_dot_connection__pb2.LoginRequest.SerializeToString,
+                response_deserializer=gRPC_dot_connection__pb2.LoginResponse.FromString,
+                )
+
+
+class LoginServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def LoginIntoApp(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_LoginServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'LoginIntoApp': grpc.unary_unary_rpc_method_handler(
+                    servicer.LoginIntoApp,
+                    request_deserializer=gRPC_dot_connection__pb2.LoginRequest.FromString,
+                    response_serializer=gRPC_dot_connection__pb2.LoginResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'connection.LoginService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class LoginService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def LoginIntoApp(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/connection.LoginService/LoginIntoApp',
+            gRPC_dot_connection__pb2.LoginRequest.SerializeToString,
+            gRPC_dot_connection__pb2.LoginResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
 class SubscribeServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
@@ -127,7 +188,7 @@ class PostIntoTopicService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
 
-class LoginServiceStub(object):
+class ListeningServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -136,42 +197,42 @@ class LoginServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.LoginIntoApp = channel.unary_unary(
-                '/connection.LoginService/LoginIntoApp',
-                request_serializer=gRPC_dot_connection__pb2.LoginRequest.SerializeToString,
-                response_deserializer=gRPC_dot_connection__pb2.LoginResponse.FromString,
+        self.ListenToTopic = channel.unary_unary(
+                '/connection.ListeningService/ListenToTopic',
+                request_serializer=gRPC_dot_connection__pb2.ListenRequest.SerializeToString,
+                response_deserializer=gRPC_dot_connection__pb2.ListenResponse.FromString,
                 )
 
 
-class LoginServiceServicer(object):
+class ListeningServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def LoginIntoApp(self, request, context):
+    def ListenToTopic(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_LoginServiceServicer_to_server(servicer, server):
+def add_ListeningServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'LoginIntoApp': grpc.unary_unary_rpc_method_handler(
-                    servicer.LoginIntoApp,
-                    request_deserializer=gRPC_dot_connection__pb2.LoginRequest.FromString,
-                    response_serializer=gRPC_dot_connection__pb2.LoginResponse.SerializeToString,
+            'ListenToTopic': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListenToTopic,
+                    request_deserializer=gRPC_dot_connection__pb2.ListenRequest.FromString,
+                    response_serializer=gRPC_dot_connection__pb2.ListenResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'connection.LoginService', rpc_method_handlers)
+            'connection.ListeningService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class LoginService(object):
+class ListeningService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def LoginIntoApp(request,
+    def ListenToTopic(request,
             target,
             options=(),
             channel_credentials=None,
@@ -181,8 +242,130 @@ class LoginService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/connection.LoginService/LoginIntoApp',
-            gRPC_dot_connection__pb2.LoginRequest.SerializeToString,
-            gRPC_dot_connection__pb2.LoginResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/connection.ListeningService/ListenToTopic',
+            gRPC_dot_connection__pb2.ListenRequest.SerializeToString,
+            gRPC_dot_connection__pb2.ListenResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
+class StopListeningServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.StopListenToTopic = channel.unary_unary(
+                '/connection.StopListeningService/StopListenToTopic',
+                request_serializer=gRPC_dot_connection__pb2.StopListenRequest.SerializeToString,
+                response_deserializer=gRPC_dot_connection__pb2.StopListenResponse.FromString,
+                )
+
+
+class StopListeningServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def StopListenToTopic(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_StopListeningServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'StopListenToTopic': grpc.unary_unary_rpc_method_handler(
+                    servicer.StopListenToTopic,
+                    request_deserializer=gRPC_dot_connection__pb2.StopListenRequest.FromString,
+                    response_serializer=gRPC_dot_connection__pb2.StopListenResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'connection.StopListeningService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class StopListeningService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def StopListenToTopic(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/connection.StopListeningService/StopListenToTopic',
+            gRPC_dot_connection__pb2.StopListenRequest.SerializeToString,
+            gRPC_dot_connection__pb2.StopListenResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
+class RecieveMessageServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.RecieveMessage = channel.unary_unary(
+                '/connection.RecieveMessageService/RecieveMessage',
+                request_serializer=gRPC_dot_connection__pb2.RecieveMessageRequest.SerializeToString,
+                response_deserializer=gRPC_dot_connection__pb2.RecieveMessageResponse.FromString,
+                )
+
+
+class RecieveMessageServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def RecieveMessage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_RecieveMessageServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'RecieveMessage': grpc.unary_unary_rpc_method_handler(
+                    servicer.RecieveMessage,
+                    request_deserializer=gRPC_dot_connection__pb2.RecieveMessageRequest.FromString,
+                    response_serializer=gRPC_dot_connection__pb2.RecieveMessageResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'connection.RecieveMessageService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class RecieveMessageService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def RecieveMessage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/connection.RecieveMessageService/RecieveMessage',
+            gRPC_dot_connection__pb2.RecieveMessageRequest.SerializeToString,
+            gRPC_dot_connection__pb2.RecieveMessageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -2,6 +2,15 @@ syntax = "proto3";
 
 package connection;
 
+message LoginRequest{
+    string username = 1;
+}
+
+message LoginResponse{
+    repeated string topics = 1;
+    int32 idNumber = 2;
+}
+
 message SubscribeRequest{
     string topic = 1;
     string client = 2;
@@ -22,13 +31,35 @@ message PostResponse{
     string textResponse = 2;
 }
 
-message LoginRequest{
+message ListenRequest{
+    string username = 1;
+    string topic = 2;
+}
+
+message ListenResponse{
+    string lisResponse = 1;
+}
+
+message StopListenRequest{
     string username = 1;
 }
 
-message LoginResponse{
-    repeated string topics = 1;
-    int32 idNumber = 2;
+message StopListenResponse{
+    string stopLisResponse = 1;
+}
+
+message RecieveMessageRequest{
+    string text = 1;
+    string topic = 2;
+    string publisher = 3;
+}
+
+message RecieveMessageResponse{
+    string reciResponse = 1;
+}
+
+service LoginService{
+    rpc LoginIntoApp(LoginRequest) returns (LoginResponse){}
 }
 
 service SubscribeService{
@@ -39,6 +70,14 @@ service PostIntoTopicService{
     rpc PostIntoTopic(PostRequest) returns (PostResponse){}
 }
 
-service LoginService{
-    rpc LoginIntoApp(LoginRequest) returns (LoginResponse){}
+service ListeningService{
+    rpc ListenToTopic(ListenRequest) returns (ListenResponse){}
+}
+
+service StopListeningService{
+    rpc StopListenToTopic(StopListenRequest) returns (StopListenResponse){}
+}
+
+service RecieveMessageService{
+    rpc RecieveMessage(RecieveMessageRequest) returns (RecieveMessageResponse){}
 }
