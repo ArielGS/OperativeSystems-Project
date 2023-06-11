@@ -1,15 +1,18 @@
 from Logic.Topic import Topic
 from Logic.Client import Client
 from Logic.Message import Message
+from concurrent import futures
 import gRPC.connection_pb2 as sender
 import gRPC.connection_pb2_grpc as server
 import os
 import time
 import grpc
+import pickle
 
 messages = []
 currentClient = Client("", "Offline")
 channel = grpc.insecure_channel('localhost:50051')
+idClient = 0
 
 def login():
     success = False
@@ -32,7 +35,7 @@ def login():
                 currentClient.subscribed = response.topics
                 print("\n ---------- LOGIN CLIENT ----------")
                 print("       Succesfully logged in.  \n")
-
+                idClient = response.idNumber
                 input("       Press Enter to continue...      ")
                 mainMenu()
             else:
@@ -121,7 +124,7 @@ def postInTopic():
 def watchTopicPosts():
     exit = ""
     topicSelected = ""
-    while exit != "y":
+    while True:
         topicsMenu()
         option = input("\n      Option:    ")
         
@@ -137,11 +140,45 @@ def watchTopicPosts():
             continue
         
         print("\n ----- POSTS IN TOPIC" + topicSelected + " -----")
-            # Se cargan los posts de un topico (desde .pickle) y se pone a a escuchar 
-            # si llegan nuevos mensajes (hay que usar hilos)
-        exit = input("\n Exit? y/n : ")
+        loadLocalMessages(topicSelected)
+        printLocalMessages()
+        remoteCall = server.ListeningService(channel)
+        request = sender.ListenResponse(username=currentClient.name, topic=topicSelected)
+        response = remoteCall.ListenToTopic(request)
 
+        if(response.lisResponse == "Success"):
+            runClientServer()
+            while(True):
+                a = "Listening"
+                # Se cargan los posts de un topico (desde .pickle) y se pone a a escuchar 
+                # si llegan nuevos mensajes (hay que usar hilos)
+        else:
+            print(" Something went wrong... Try again.")
+            input(" Press Enter to continue...")
         os.system('cls')
+
+def loadLocalMessages(topic):
+    try:
+        with open("messages" + topic + currentClient.name + ".pickle", 'rb') as archivo:
+            messages = pickle.load(file)
+    except (FileNotFoundError):
+        with open("messages" + topic + currentClient.name + ".pickle", "wb") as file:
+            pickle.dump(messages, file)
+
+def printLocalMessages():
+    try:
+        for message in messages:
+            print(" " + message.publisher + ": " + message.text)
+    except (Exception):
+        pass
+
+def runClientServer():
+    serverInstance = ServerClient()
+    serverGrpc = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
+    server.add_RecieveMessageServiceServicer_to_server(serverInstance, serverGrpc)
+    serverGrpc.add_insecure_port(f'[::]:{50051 + idClient}')
+    serverGrpc.start()
+    serverGrpc.wait_for_termination()
 
 def mainMenu():
     while currentClient.state == True:
@@ -173,6 +210,11 @@ def mainMenu():
         else:
             print(" Unvalid option. Try again.")
             input(" Press Enter to continue...")
+
+class ServerClient(server.RecieveMessageServiceServicer):
+    def RecieveMessage(self, request, context):
+        print(" " + request.publisher + ": " + request.text)
+        return sender.RecieveMessageResponse(reciResponse = "Success")
 
 if __name__ == "__main__":
     os.system('cls')

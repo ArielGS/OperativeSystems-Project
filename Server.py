@@ -8,7 +8,10 @@ from Logic.Client import Client
 from Logic.Message import Message
 
 cond = threading.Condition()
-lock = threading.Lock()
+lockMain = threading.Lock()
+lockTopicA = threading.Lock()
+lockTopicB = threading.Lock()
+lockTopicC = threading.Lock()
 activeUsers = 0
 
 def saveClients(clients):
@@ -23,8 +26,8 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
         self.messagesTopicC = []
         self.clients = {}
         try:
-            with open('clients.pickle', 'rb') as archivo:
-                self.clients = pickle.load(archivo)
+            with open('clients.pickle', 'rb') as file:
+                self.clients = pickle.load(file)
         except (FileNotFoundError):
             self.clients["First"] = Client("First", False)
             saveClients(self.clients)
@@ -32,26 +35,26 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
     def LoginIntoApp(self, request, context):
         global activeUsers
         if self.clients.get(request.username) is not None:
-            lock.acquire()
+            lockMain.acquire()
             self.clients[request.username].state = True
             self.clients[request.username].idNumber = activeUsers
             activeUsers = activeUsers + 1
-            lock.release()
+            lockMain.release()
         else:
-            lock.acquire()
+            lockMain.acquire()
             self.clients[request.username] = Client(request.username, True)
             self.clients[request.username].idNumber = activeUsers
             activeUsers = activeUsers + 1
             saveClients(self.clients)
-            lock.release()
+            lockMain.release()
         return sender.LoginResponse(topics=self.clients[request.username].subscribed, idNumber=activeUsers-1)
     
     def SubcribeToTopic(self, request, context):
         if self.clients.get(request.client) is not None:
-            lock.acquire()
+            lockMain.acquire()
             client = self.clients[request.client]
             client.subscribe(request.topic)
-            lock.release()
+            lockMain.release()
             return sender.SubscribeResponse(subsResponse=True)
         return sender.SubscribeResponse(subsResponse=False)
     
@@ -61,13 +64,19 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
             if request.topic in current.subscribed:
                 newMessage = Message(request.text, request.topic, request.publisher, None)
                 if request.topic == "A":
+                    lockTopicA.acquire()
                     self.messagesTopicA.append(newMessage)
+                    lockTopicA.release()
                 elif request.topic == "B":
+                    lockTopicB.acquire()
                     self.messagesTopicB.append(newMessage)
+                    lockTopicB.release()
                 elif request.topic == "C":
+                    lockTopicC.acquire()
                     self.messagesTopicC.append(newMessage)
+                    lockTopicC.release()
                 #Enviar el msj.
-                print("New Message posted: " + request.text)
+                print(" New Message posted: " + request.text)
                 return sender.PostResponse(postedResponse = True, textResponse = "Successfully posted.")
             else:
                 return sender.PostResponse(postedResponse = False, textResponse = "You are not subscribed to that topic.")
@@ -82,7 +91,7 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
     def StopListenToTopic(self, request, context):
         return sender.StopListenResponse(stopLisResponse = "Success")
 
-def run_server():
+def runServer():
     serverInstance = Server()
     serverGrpc = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
     serverProto.add_SubscribeServiceServicer_to_server(serverInstance, serverGrpc)
@@ -92,11 +101,11 @@ def run_server():
     serverProto.add_StopListeningServiceServicer_to_server(serverInstance, serverGrpc)
     serverGrpc.add_insecure_port('[::]:50051')
     serverGrpc.start()
-    print("Initialized gRPC server in port 50051")
+    print(" Initialized gRPC server in port 50051")
     serverGrpc.wait_for_termination()
 
 if __name__ == '__main__':
-    run_server()
+    runServer()
 
 
 
