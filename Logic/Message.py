@@ -4,7 +4,3 @@ class Message:
         self.topic = topic
         self.publisher = publisher
         self.consumer = consumer
-        self.read = False
-
-    def mark_as_read(self):
-        self.read = True

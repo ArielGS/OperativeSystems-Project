@@ -81,3 +81,7 @@ service StopListeningService{
 service RecieveMessageService{
     rpc RecieveMessage(RecieveMessageRequest) returns (RecieveMessageResponse){}
 }
+
+service CallDequeueService{
+    rpc CallDequeueMessages(ListenRequest) returns (ListenResponse){}
+}

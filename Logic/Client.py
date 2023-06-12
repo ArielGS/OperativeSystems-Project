@@ -4,7 +4,7 @@ class Client:
         self.state = state
         self.subscribed = []
         self.idNumber = 0
-        self.listening = None
+        self.listening = "None"
 
     def subscribe(self, topic):
         self.subscribed.append(topic)

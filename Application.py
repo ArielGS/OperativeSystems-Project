@@ -4,8 +4,8 @@ from Logic.Message import Message
 from concurrent import futures
 import gRPC.connection_pb2 as sender
 import gRPC.connection_pb2_grpc as server
+import threading
 import os
-import time
 import grpc
 import pickle
 
@@ -139,31 +139,46 @@ def watchTopicPosts():
             input(" Press Enter to continue...")
             continue
         
-        print("\n ----- POSTS IN TOPIC" + topicSelected + " -----")
+        print("\n ----- POSTS IN TOPIC " + topicSelected + " -----")
+        print("    Press Ctrl + C to exit\n")
         loadLocalMessages(topicSelected)
         printLocalMessages()
-        remoteCall = server.ListeningService(channel)
-        request = sender.ListenResponse(username=currentClient.name, topic=topicSelected)
+        remoteCall = server.ListeningServiceStub(channel)
+        request = sender.ListenRequest(username=currentClient.name, topic=topicSelected)
         response = remoteCall.ListenToTopic(request)
 
         if(response.lisResponse == "Success"):
-            runClientServer()
-            while(True):
-                a = "Listening"
-                # Se cargan los posts de un topico (desde .pickle) y se pone a a escuchar 
-                # si llegan nuevos mensajes (hay que usar hilos)
+            serverThread = threading.Thread(target=runClientServer)
+            auxThread = threading.Thread(target=lambda: serverThread.start())
+            clientThread = threading.Thread(target=lambda: callDeQueueRPC(topicSelected)) 
+
+            auxThread.start()
+            auxThread.join()
+            clientThread.start()  
+            try:
+                while True:
+                    pass
+            except KeyboardInterrupt:
+                pass
+                input(" \n Press Enter to continue...")
+
         else:
             print(" Something went wrong... Try again.")
             input(" Press Enter to continue...")
         os.system('cls')
 
+def callDeQueueRPC(topicSelected):
+    remoteCall = server.CallDequeueServiceStub(channel)
+    request = sender.ListenRequest(username=currentClient.name, topic=topicSelected)
+    response = remoteCall.CallDequeueMessages(request)
+
 def loadLocalMessages(topic):
+    global messages
     try:
-        with open("messages" + topic + currentClient.name + ".pickle", 'rb') as archivo:
+        with open("messages" + topic + currentClient.name + ".pickle", 'rb') as file:
             messages = pickle.load(file)
-    except (FileNotFoundError):
-        with open("messages" + topic + currentClient.name + ".pickle", "wb") as file:
-            pickle.dump(messages, file)
+    except (Exception):
+        pass
 
 def printLocalMessages():
     try:
@@ -172,13 +187,19 @@ def printLocalMessages():
     except (Exception):
         pass
 
+def saveMessages(topic):
+    with open("messages" + topic + currentClient.name + ".pickle", "wb") as file:
+        pickle.dump(messages, file)
+
 def runClientServer():
     serverInstance = ServerClient()
     serverGrpc = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
     server.add_RecieveMessageServiceServicer_to_server(serverInstance, serverGrpc)
-    serverGrpc.add_insecure_port(f'[::]:{50051 + idClient}')
+    port = f'[::]:{50052 + idClient}'
+    serverGrpc.add_insecure_port(port)
     serverGrpc.start()
     serverGrpc.wait_for_termination()
+
 
 def mainMenu():
     while currentClient.state == True:
@@ -214,6 +235,8 @@ def mainMenu():
 class ServerClient(server.RecieveMessageServiceServicer):
     def RecieveMessage(self, request, context):
         print(" " + request.publisher + ": " + request.text)
+        messages.append(Message(request.text, request.topic, request.publisher, currentClient.name))
+        saveMessages(request.topic)
         return sender.RecieveMessageResponse(reciResponse = "Success")
 
 if __name__ == "__main__":

@@ -369,3 +369,64 @@ class RecieveMessageService(object):
             gRPC_dot_connection__pb2.RecieveMessageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+
+class CallDequeueServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.CallDequeueMessages = channel.unary_unary(
+                '/connection.CallDequeueService/CallDequeueMessages',
+                request_serializer=gRPC_dot_connection__pb2.ListenRequest.SerializeToString,
+                response_deserializer=gRPC_dot_connection__pb2.ListenResponse.FromString,
+                )
+
+
+class CallDequeueServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def CallDequeueMessages(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_CallDequeueServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'CallDequeueMessages': grpc.unary_unary_rpc_method_handler(
+                    servicer.CallDequeueMessages,
+                    request_deserializer=gRPC_dot_connection__pb2.ListenRequest.FromString,
+                    response_serializer=gRPC_dot_connection__pb2.ListenResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'connection.CallDequeueService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class CallDequeueService(object):
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def CallDequeueMessages(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/connection.CallDequeueService/CallDequeueMessages',
+            gRPC_dot_connection__pb2.ListenRequest.SerializeToString,
+            gRPC_dot_connection__pb2.ListenResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

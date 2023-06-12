@@ -19,7 +19,8 @@ def saveClients(clients):
         pickle.dump(clients, file)
 
 class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServicer, 
-             serverProto.PostIntoTopicServiceServicer, serverProto.ListeningServiceServicer, serverProto.StopListeningServiceServicer):
+             serverProto.PostIntoTopicServiceServicer, serverProto.ListeningServiceServicer, 
+             serverProto.StopListeningServiceServicer, serverProto.CallDequeueServiceServicer):
     def __init__(self):
         self.messagesTopicA = []
         self.messagesTopicB = []
@@ -29,8 +30,7 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
             with open('clients.pickle', 'rb') as file:
                 self.clients = pickle.load(file)
         except (FileNotFoundError):
-            self.clients["First"] = Client("First", False)
-            saveClients(self.clients)
+            pass
 
     def LoginIntoApp(self, request, context):
         global activeUsers
@@ -64,32 +64,124 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
             if request.topic in current.subscribed:
                 newMessage = Message(request.text, request.topic, request.publisher, None)
                 if request.topic == "A":
-                    lockTopicA.acquire()
-                    self.messagesTopicA.append(newMessage)
-                    lockTopicA.release()
+                    if 100-len(self.messagesTopicA) >= len(self.clients)-activeUsers:
+                        if self.SendMessage(newMessage):
+                            print(" New Message posted: " + request.text)
+                            return sender.PostResponse(postedResponse = True, textResponse = " Successfully posted.")
+                    else:
+                        return sender.PostResponse(postedResponse = False, textResponse = " Not enough space in messages queue. Try later")
                 elif request.topic == "B":
-                    lockTopicB.acquire()
-                    self.messagesTopicB.append(newMessage)
-                    lockTopicB.release()
+                    if 100-len(self.messagesTopicB) >= len(self.clients)-activeUsers:
+                        if self.SendMessage(newMessage):
+                            print(" New Message posted: " + request.text)
+                            return sender.PostResponse(postedResponse = True, textResponse = " Successfully posted.")
+                    else:
+                        return sender.PostResponse(postedResponse = False, textResponse = " Not enough space in messages queue.")
                 elif request.topic == "C":
-                    lockTopicC.acquire()
-                    self.messagesTopicC.append(newMessage)
-                    lockTopicC.release()
-                #Enviar el msj.
-                print(" New Message posted: " + request.text)
-                return sender.PostResponse(postedResponse = True, textResponse = "Successfully posted.")
+                    if 100-len(self.messagesTopicC) >= len(self.clients)-activeUsers:
+                        if self.SendMessage(newMessage):
+                            print(" New Message posted: " + request.text)
+                            return sender.PostResponse(postedResponse = True, textResponse = " Successfully posted.")
+                    else:
+                        return sender.PostResponse(postedResponse = False, textResponse = " Not enough space in messages queue.")
             else:
-                return sender.PostResponse(postedResponse = False, textResponse = "You are not subscribed to that topic.")
-        return sender.PostResponse(postedResponse = False, textResponse = "Error. Try again.")
-    
+                return sender.PostResponse(postedResponse = False, textResponse = " You are not subscribed to that topic.")
+        return sender.PostResponse(postedResponse = False, textResponse = " Error. Try again.")
+
     def SendMessage(self, message):
-        return 0
+            for client in self.clients:
+                client = self.clients[client]
+                message.consumer = client.name
+                if client.listening == message.topic:
+                    port = f'localhost:{50052 + client.idNumber}'
+                    channel = grpc.insecure_channel(port)
+                    remoteCall = serverProto.RecieveMessageServiceStub(channel)
+                    request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher)
+                    response = remoteCall.RecieveMessage(request)
+                    
+                else:
+                    if message.topic == "A":
+                        lockTopicA.acquire()
+                        self.messagesTopicA.append(message)
+                        lockTopicA.release()
+                    elif message.topic == "B":
+                        lockTopicB.acquire()
+                        self.messagesTopicB.append(message)
+                        lockTopicB.release()
+                    elif message.topic == "C":
+                        lockTopicC.acquire()
+                        self.messagesTopicC.append(message)
+                        lockTopicC.release()
+            return True
+
+    def DeQueueMessages(self, request):
+        try:
+            current = self.clients[request.username]
+            if request.topic == "A":
+                for i in range(len(self.messagesTopicA)):
+                    lockTopicA.acquire()
+                    message = self.messagesTopicA.pop()
+                    if message.consumer == current.name:
+                        port = f'localhost:{50052 + current.idNumber}'
+                        channel = grpc.insecure_channel(port)
+                        remoteCall = serverProto.RecieveMessageServiceStub(channel)
+                        request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher)
+                        try:
+                            response = remoteCall.RecieveMessage(request)
+                        except (Exception):
+                            self.messagesTopicA.append(message)
+                    else:
+                        self.messagesTopicA.append(message)
+                    lockTopicA.release()
+            elif request.topic == "B":
+                for i in range(len(self.messagesTopicA)):
+                    lockTopicA.acquire()
+                    message = self.messagesTopicA.pop()
+                    if message.consumer == current.name:
+                        port = f'localhost:{50052 + current.idNumber}'
+                        channel = grpc.insecure_channel(port)
+                        remoteCall = serverProto.RecieveMessageServiceStub(channel)
+                        request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher)
+                        try:
+                            response = remoteCall.RecieveMessage(request)
+                        except (Exception):
+                            self.messagesTopicA.append(message)
+                    else:
+                        self.messagesTopicA.append(message)
+                    lockTopicA.release()
+            elif request.topic == "C":
+                for i in range(len(self.messagesTopicA)):
+                    lockTopicA.acquire()
+                    message = self.messagesTopicA.pop()
+                    if message.consumer == current.name:
+                        port = f'localhost:{50052 + current.idNumber}'
+                        channel = grpc.insecure_channel(port)
+                        remoteCall = serverProto.RecieveMessageServiceStub(channel)
+                        request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher)
+                        try:
+                            response = remoteCall.RecieveMessage(request)
+                        except (Exception):
+                            self.messagesTopicA.append(message)
+                    else:
+                        self.messagesTopicA.append(message)
+                    lockTopicA.release()
+        except (Exception):
+            return False
+        return True
 
     def ListenToTopic(self, request, context):
+        self.clients[request.username].listening = request.topic
         return sender.ListenResponse(lisResponse = "Success")
     
     def StopListenToTopic(self, request, context):
+        self.clients[request.username].listening = None
         return sender.StopListenResponse(stopLisResponse = "Success")
+    
+    def CallDequeueMessages(self, request, context):
+        if self.DeQueueMessages(request):
+            return sender.ListenResponse(lisResponse = "Success")
+        else:
+            return sender.ListenResponse(lisResponse = "Failed")
 
 def runServer():
     serverInstance = Server()
@@ -99,6 +191,7 @@ def runServer():
     serverProto.add_LoginServiceServicer_to_server(serverInstance, serverGrpc)
     serverProto.add_ListeningServiceServicer_to_server(serverInstance, serverGrpc)
     serverProto.add_StopListeningServiceServicer_to_server(serverInstance, serverGrpc)
+    serverProto.add_CallDequeueServiceServicer_to_server(serverInstance, serverGrpc)
     serverGrpc.add_insecure_port('[::]:50051')
     serverGrpc.start()
     print(" Initialized gRPC server in port 50051")
