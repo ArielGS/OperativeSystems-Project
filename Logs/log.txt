@@ -1,0 +1,24 @@
+
+ 2023-06-12 - 15:06:10: Initialized gRPC server in port 50051.
+
+ 2023-06-12 - 15:06:28: Client Ariel succesfully registered and logged. 
+
+ 2023-06-12 - 15:06:45: Client Ariel subscribed to topic A.
+
+ 2023-06-12 - 15:07:14: Client Pepe succesfully registered and logged. 
+
+ 2023-06-12 - 15:07:18: Client Pepe subscribed to topic A.
+
+ 2023-06-12 - 15:07:35: Pepe posted in topic A: Pepe escribiendo 1
+
+ 2023-06-12 - 15:07:48: Pepe posted in topic A: Pepe escribiendo 2
+
+ 2023-06-12 - 15:08:06: Initialized gRPC server in port 50051.
+
+ 2023-06-12 - 15:08:22: Client Ariel succesfully logged. 
+
+ 2023-06-12 - 15:08:27: Ariel is listening to Topic A messages.
+
+ 2023-06-12 - 15:08:29: Message from topic A to client Ariel has been dequeued.
+
+ 2023-06-12 - 15:08:29: Message from topic A to client Ariel has been dequeued.

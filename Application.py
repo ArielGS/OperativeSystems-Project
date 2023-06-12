@@ -10,9 +10,11 @@ import grpc
 import pickle
 
 messages = []
-currentClient = Client("", "Offline")
+currentClient = Client("", False)
 channel = grpc.insecure_channel('localhost:50051')
 idClient = 0
+serverGrpc = None
+messagesLock = threading.Lock()
 
 def login():
     success = False
@@ -34,13 +36,14 @@ def login():
             if not response == None:
                 currentClient.subscribed = response.topics
                 print("\n ---------- LOGIN CLIENT ----------")
-                print("       Succesfully logged in.  \n")
+                print("    Succesfully logged in.  \n")
+                global idClient
                 idClient = response.idNumber
-                input("       Press Enter to continue...      ")
+                input("    Press Enter to continue...      ")
                 mainMenu()
             else:
-                print(" Incorrect username. Try again.  ")
-                input(" Press Enter to continue...      ")
+                print("    Incorrect username. Try again.  ")
+                input("    Press Enter to continue...      ")
                 os.system('cls')
         else:
             print(" Incorrect username. Try again.  ")
@@ -49,9 +52,8 @@ def login():
 
 def logout():
     currentClient.state = False
-    #Enviar señal a servidor para apagar hilo y
-    #desactivar el worker / hilo 
-    print("Leaving Session...")
+    channel.close()
+    print(" Leaving Session...")
 
 def topicsMenu():
     print("\n ----- CHOOSE A TOPIC -----")
@@ -63,7 +65,7 @@ def topicsMenu():
 
 def subscribeMenu():
     topicsMenu()
-    option = input("\n      Option:    ")
+    option = input("\n      Option: ")
     topicSelected = ""
     os.system('cls')
 
@@ -80,22 +82,22 @@ def subscribeMenu():
     remoteCall = server.SubscribeServiceStub(channel)
     request = sender.SubscribeRequest(topic=topicSelected, client=currentClient.name)
     response = remoteCall.SubcribeToTopic(request)
-
+    print("\n ----- CHOOSE A TOPIC ----- \n")
     if(response.subsResponse == True):
-        print("Successfully subscribed to TOPIC " + topicSelected)
+        print(" Successfully subscribed to TOPIC " + topicSelected)
     else:
-        print("Something went wrong. Try again.")
+        print(" Something went wrong. Try again.")
         
-    input(" Press Enter to continue...")
+    input("\n Press Enter to continue...")
 
 def postInTopic():
     exit = ""
     topicSelected = ""
     message = ""
 
-    while exit != "y":
+    while exit != "y" and exit != "Y":
         topicsMenu()
-        option = input("\n      Option:    ")
+        option = input("\n      Option: ")
         
         os.system('cls')
 
@@ -115,7 +117,7 @@ def postInTopic():
         request = sender.PostRequest(text=message, topic=topicSelected, publisher=currentClient.name)
         response = remoteCall.PostIntoTopic(request)
         
-        print(response.textResponse)
+        print("\n" + response.textResponse)
         
         exit = input("\n Exit? y/n : ")
 
@@ -126,7 +128,7 @@ def watchTopicPosts():
     topicSelected = ""
     while True:
         topicsMenu()
-        option = input("\n      Option:    ")
+        option = input("\n      Option: ")
         
         os.system('cls')
 
@@ -159,8 +161,12 @@ def watchTopicPosts():
                 while True:
                     pass
             except KeyboardInterrupt:
-                pass
+                remoteCall = server.StopListeningServiceStub(channel)
+                request = sender.StopListenRequest(username=currentClient.name)
+                response = remoteCall.StopListenToTopic(request)
+                serverGrpc.stop(grace=5)
                 input(" \n Press Enter to continue...")
+                return
 
         else:
             print(" Something went wrong... Try again.")
@@ -175,24 +181,28 @@ def callDeQueueRPC(topicSelected):
 def loadLocalMessages(topic):
     global messages
     try:
-        with open("messages" + topic + currentClient.name + ".pickle", 'rb') as file:
+        with open("ClientMessages/messages" + topic + currentClient.name + ".pickle", 'rb') as file:
             messages = pickle.load(file)
     except (Exception):
-        pass
+        messages = []
 
 def printLocalMessages():
     try:
         for message in messages:
-            print(" " + message.publisher + ": " + message.text)
+            if(message.publisher != currentClient.name):
+                print(" " + message.publisher + ": " + message.text)
+            else:
+                print(" You: " + message.text)
     except (Exception):
         pass
 
 def saveMessages(topic):
-    with open("messages" + topic + currentClient.name + ".pickle", "wb") as file:
+    with open("ClientMessages/messages" + topic + currentClient.name + ".pickle", "wb") as file:
         pickle.dump(messages, file)
 
 def runClientServer():
     serverInstance = ServerClient()
+    global serverGrpc
     serverGrpc = grpc.server(futures.ThreadPoolExecutor(max_workers=3))
     server.add_RecieveMessageServiceServicer_to_server(serverInstance, serverGrpc)
     port = f'[::]:{50052 + idClient}'
@@ -234,9 +244,14 @@ def mainMenu():
 
 class ServerClient(server.RecieveMessageServiceServicer):
     def RecieveMessage(self, request, context):
-        print(" " + request.publisher + ": " + request.text)
+        if(request.publisher != currentClient.name):
+            print(" " + request.publisher + ": " + request.text)
+        else:
+            print(" You: " + request.text)
+        messagesLock.acquire()
         messages.append(Message(request.text, request.topic, request.publisher, currentClient.name))
         saveMessages(request.topic)
+        messagesLock.release()
         return sender.RecieveMessageResponse(reciResponse = "Success")
 
 if __name__ == "__main__":
