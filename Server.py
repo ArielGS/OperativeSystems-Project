@@ -9,7 +9,6 @@ from concurrent import futures
 from Logic.Client import Client
 from Logic.Message import Message
 
-cond = threading.Condition()
 lockMain = threading.Lock()
 lockTopicA = threading.Lock()
 lockTopicB = threading.Lock()
@@ -20,6 +19,13 @@ def saveClients(clients):
     with open("Clients/clients.pickle", "wb") as file:
         pickle.dump(clients, file)
 
+def saveMessagesQueue(queueMessages, topic):
+    try:
+        with open("ServerMessages/queueTopic" + topic + ".pickle", "wb") as file:
+            pickle.dump(queueMessages, file)
+    except Exception as e:
+        print("Error by adding queue:", str(e))
+
 def addEventLog(event):
     previous = ""
     try:
@@ -27,13 +33,6 @@ def addEventLog(event):
             file.write(previous + '\n' + event)
     except Exception as e:
         print("Error by adding event to the log:", str(e))
-
-def saveMessagesQueue(queueMessages, topic):
-    try:
-        with open("ServerMessages/queueTopic" + topic + ".pickle", "wb") as file:
-            pickle.dump(queueMessages, file)
-    except Exception as e:
-        print("Error by adding queue:", str(e))
 
 def getTime():
     now = datetime.now()
@@ -43,6 +42,7 @@ def getTime():
 class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServicer, 
              serverProto.PostIntoTopicServiceServicer, serverProto.ListeningServiceServicer, 
              serverProto.StopListeningServiceServicer, serverProto.CallDequeueServiceServicer):
+    
     def __init__(self):
         self.messagesTopicA = []
         self.messagesTopicB = []
@@ -201,7 +201,7 @@ class Server(serverProto.LoginServiceServicer, serverProto.SubscribeServiceServi
                         port = f'localhost:{50052 + current.idNumber}'
                         channel = grpc.insecure_channel(port)
                         remoteCall = serverProto.RecieveMessageServiceStub(channel)
-                        request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher + "\n")
+                        request = sender.RecieveMessageRequest(text=message.text, topic=message.topic, publisher=message.publisher)
                         try:
                             response = remoteCall.RecieveMessage(request)
                             if(response.reciResponse == "Success"):
@@ -271,8 +271,3 @@ def runServer():
 
 if __name__ == '__main__':
     runServer()
-
-
-
-
-
